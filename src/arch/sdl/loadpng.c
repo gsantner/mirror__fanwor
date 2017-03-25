@@ -238,6 +238,9 @@ SDL_Surface *LoadPNG(const char *fname)
 	/* Load the palette, if any */
 	palette = surface->format->palette;
 	if ( palette ) {
+	    int png_num_palette;
+	    png_colorp png_palette;
+	    png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_num_palette);
 	    if(color_type == PNG_COLOR_TYPE_GRAY) {
 		palette->ncolors = 256;
 		for(i = 0; i < 256; i++) {
@@ -245,10 +248,7 @@ SDL_Surface *LoadPNG(const char *fname)
 		    palette->colors[i].g = i;
 		    palette->colors[i].b = i;
 		}
-	    } else if (png_get_palette_max(png_ptr, info_ptr) > 0 ) {
-		png_colorp png_palette;
-		int png_num_palette;
-		png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_num_palette);
+	    } else if (png_num_palette > 0) {
 		palette->ncolors = png_num_palette;
 		for (i = 0; i < png_num_palette; ++i) {
 		    palette->colors[i].b = png_palette[i].blue;
