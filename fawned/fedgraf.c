@@ -4,6 +4,7 @@
 #include "feddefs.h"
 #include "fwdefs.h"
 #include "fwdata.h"
+#include "sdlgui.h"
 
 #ifndef FALSE
 #define FALSE 0
@@ -114,8 +115,12 @@ void drwindow()
 			if( en[i].eintrtyp==2 && (short)en[i].xpos>=rwx && (short)en[i].ypos>=rwy
 			                && (short)en[i].xpos<rwx+rww && (short)en[i].ypos<rwy+rwh )
 			{
-//				PutString(sdlscrn, (en[i].xpos-rwx)*32, (en[i].ypos-rwy)*32,"D");
-printf("FIXME!\n");
+				rd.x = (en[i].xpos - rwx) * 32;
+				rd.y = (en[i].ypos - rwy) * 32;
+				rd.w = 8;
+				rd.h = 16;
+				SDL_FillRect(sdlscrn, &rd, SDL_MapRGB(sdlscrn->format, 255, 128, 255));
+				SDLGui_Text(rd.x, rd.y, "D");
 			}
 		}
 	}
@@ -161,7 +166,10 @@ printf("FIXME!\n");
 					rd.y=dcy*32;
 					rd.w=rd.h=32;
 					if(index<DIFSPRTNUM)
+					{
+						SDL_FillRect(sdlscrn, &rd, SDL_MapRGB(sdlscrn->format, 192, 192, 192) );
 						SDL_BlitSurface(spritegfx, &rs, sdlscrn, &rd);
+					}
 					else
 						SDL_FillRect(sdlscrn, &rd, SDL_MapRGB(sdlscrn->format, 0, 0, 0) );
 				}
@@ -169,10 +177,15 @@ printf("FIXME!\n");
 		}
 	}
 
-	rd.x=0;
-	rd.y=0;
-	rd.w=rww*32;
-	rd.h=rwh*32;
-	SDL_UpdateRects(sdlscrn, 1, &rd);
+	/* Redraw the status bar */
+	rd.x = 0;
+	rd.y = sdlscrn->h - 32;
+	rd.w = sdlscrn->w;
+	rd.h = 32;
+	SDL_FillRect(sdlscrn, &rd, SDL_MapRGB(sdlscrn->format, 0, 0, 0) );
+
+	/* Refresh screen */
+	SDL_UpdateRect(sdlscrn, 0,0, 0,0);
+
 	/* unlock surface */
 }

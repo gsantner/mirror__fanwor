@@ -2,11 +2,11 @@
                    ***********************************
                    *              FANWOR             *
                    *                                 *
-                   *          Version 1.13           *
+                   *          Version 1.14           *
                    * * * * * * * * * * * * * * * * * *
-                   *        Written and (c) by       *
+                   *   Written and copyright(c) by   *
                    *           Thomas Huth           *
-                   *         1999-2001, 2012         *
+                   *           1999, 2016            *
                    * * * * * * * * * * * * * * * * * *
                    * WWW:                            *
                    *  http://fanwor.tuxfamily.org/   *

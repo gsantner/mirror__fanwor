@@ -29,19 +29,6 @@ unsigned long swap_long(unsigned long D)
 }
 
 
-/* ***Fileselector*** */
-int fileselect(char *fstitle)
-{
-	short i;
-
-	fprintf(stderr,"\n%s\n",fstitle);
-	fprintf(stderr,"Enter file name: ");
-	i = scanf("%s", fname);
-
-	return (i != 1);
-}
-
-
 /* *** Level laden *** */
 int loadlevel(char *fname)
 {

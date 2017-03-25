@@ -3,11 +3,13 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "fedmain.h"
 #include "feddefs.h"
 #include "fedgraf.h"
 #include "feddisk.h"
+#include "sdlgui.h"
 
 #ifndef FALSE
 #define FALSE 0
@@ -21,6 +23,7 @@
 void handle_keypress(int key)
 {
 	int dx, dy;
+	char *new_fname;
 
 	switch(key)
 	{
@@ -36,14 +39,24 @@ void handle_keypress(int key)
 		drwindow();
 		break;
 	case 'l':                 /* LOADFILE */
-		if( fileselect("Load a level")==0 )
+		new_fname = SDLGui_FileSelect(fname, NULL, 0);
+		if (new_fname != NULL)
+		{
+			strcpy(fname, new_fname);
+			free(new_fname);
 			loadlevel(fname);
+		}
 		drawoffscr(rwx, rwy, rww, rwh);
 		drwindow();
 		break;
 	case 's':                 /* SAVEFILE: */
-		if( fileselect("Save a level")==0 )
+		new_fname = SDLGui_FileSelect(fname, NULL, 1);
+		if (new_fname != NULL)
+		{
+			strcpy(fname, new_fname);
+			free(new_fname);
 			savelevel(fname);
+		}
 		break;
 	case '0':                 /* EREASE: */
 		fprintf(stderr,"\nErease mode\n");

@@ -3,6 +3,8 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <stdint.h>
+
 typedef struct
 {
 	unsigned char eintrtyp;
@@ -28,11 +30,11 @@ eintrtyp:
 
 typedef struct
 {
-	long hmagic;            /* magic constant, must be 'FAWO' */
-	short version;          /* For checking the version - 0x0123 e.g. would be version 1.23 */
-	char titel[32];         /* name of the level */
-	unsigned short anz_obj;   /* number of the objects (LEVEL_EINTRAGs) in this room (see above) */
-	unsigned short r_wdth, r_hght; /* Width and height of this room */
+	uint32_t hmagic;          /* magic constant, must be 'FAWO' */
+	uint16_t version;         /* For checking the version - 0x0123 e.g. would be version 1.23 */
+	char titel[32];           /* name of the level */
+	uint16_t anz_obj;         /* number of the objects (LEVEL_EINTRAGs) in this room (see above) */
+	uint16_t r_wdth, r_hght;  /* Width and height of this room */
 } LEVEL_HEADER;
 
 /* Level-header + playing-field + anz_obj * LEVEL_EINTRAGs = Level file */

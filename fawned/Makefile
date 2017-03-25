@@ -1,6 +1,7 @@
 #Makefile for "FAWNED - The FANWOR EDITOR"
 
-OBS=fedinit.o fedgraf.o fedkeys.o feddisk.o fedmain.o
+OBS=fedinit.o fedgraf.o fedkeys.o feddisk.o fedmain.o \
+    sdlgui.o dlgAlert.o dlgFileSelect.o file.o
 FWOBS=../src/fwdata.o ../src/arch/sdl/loadpng.o
 
 CFLAGS = -g -O1 -Wall $(shell sdl-config --cflags)

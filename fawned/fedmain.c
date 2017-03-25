@@ -64,7 +64,7 @@ void printhelp(void)
 
 
 /* ***Die Hauptroutine*** */
-int main(void)
+int main(int argc, char *argv[])
 {
 	short dx,dy;		/* Dummyvariablen */
 	//short dw,dh;
@@ -82,25 +82,33 @@ int main(void)
 		return -1;
 	}
 
-	/* Jetzt noch in den Raumordner... */
+	/* Clear the playground */
+	for (dy = 0; dy < 128; dy++)
+	{
+		for (dx=0; dx < 128; dx++)
+		{
+			sfeld[dx][dy]=1;
+			ffeld[dx][dy]=0;
+		}
+	}
+
+	fprintf(stderr,"\n    **** Welcome to FAWNED ****\n");
+
+	if (argc == 2 && argv[1][0] != '-')
+	{
+		loadlevel(argv[1]);
+	}
+
+	drawoffscr(rwx, rwy, rww, rwh);
+	drwindow();
+
+	/* Change current directory to the room folder */
 	if (chdir("../rooms/") != 0)
 	{
 		fprintf(stderr, "Can not change to rooms directory\n");
 		return -1;
 	}
 
-	/* Feld vorbelegen */
-	for(dy=0; dy<128; dy++)
-		for(dx=0; dx<128; dx++)
-		{
-			sfeld[dx][dy]=1;
-			ffeld[dx][dy]=0;
-		}
-
-	drawoffscr(rwx, rwy, rww, rwh);
-	drwindow();
-
-	fprintf(stderr,"\n    **** Willkommen bei FAWNED ****\n");
 	printhelp();
 
 	/* Die Hauptschleife: */

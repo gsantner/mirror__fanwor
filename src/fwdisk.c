@@ -36,28 +36,26 @@ char roomname[256];
 extern char spec_gemz[8];
 
 
-
-static unsigned short swap_short(unsigned short in)
+static unsigned short swap_u16(uint16_t in)
 {
-	unsigned short out;
-	out=((char)in)<<8;
-	out|=(in>>8);
+	uint16_t out;
+	out = in << 8;
+	out |= in >> 8;
 	return out;
 }
 
-static unsigned long swap_long(unsigned long in)
+static unsigned long swap_u32(uint32_t in)
 {
-	unsigned long out;
-	unsigned short o1, o2;
-	o1=(unsigned short)(in>>16);
-	o2=(unsigned short)(in);
-	o1=swap_short(o1);
-	o2=swap_short(o2);
-	out=((unsigned long)o2)<<16;
-	out|=o1;
+	uint32_t out;
+	uint16_t o1, o2;
+	o1 = (uint16_t)(in>>16);
+	o2 = (uint16_t)in;
+	o1 = swap_u16(o1);
+	o2 = swap_u16(o2);
+	out = ((uint32_t)o2) << 16;
+	out |= o1;
 	return out;
 }
-
 
 
 /* ***Load a new room*** */
@@ -103,25 +101,27 @@ int loadroom(void)
 
 	if (fread(&hd, sizeof(LEVEL_HEADER), 1, fhndl) != 1)
 	{
+		fclose(fhndl);
 		errfatldlg("Could not read\nlevel file!");
 		return -1;
 	}
 
-	if(hd.hmagic!=(long)0x4641574FL)  /*'FAWO'*/
+	if (hd.hmagic != 0x4641574FL)  /*'FAWO'*/
 	{
-		hd.hmagic=swap_long(hd.hmagic);
-		hd.version=swap_short(hd.version);
-		hd.anz_obj=swap_short(hd.anz_obj);
-		hd.r_wdth=swap_short(hd.r_wdth);
-		hd.r_hght=swap_short(hd.r_hght);
+		hd.hmagic = swap_u32(hd.hmagic);
+		hd.version = swap_u16(hd.version);
+		hd.anz_obj = swap_u16(hd.anz_obj);
+		hd.r_wdth = swap_u16(hd.r_wdth);
+		hd.r_hght = swap_u16(hd.r_hght);
 	}
 
-	if(hd.hmagic!=(long)0x4641574FL)  /*'FAWO'*/
+	if (hd.hmagic != 0x4641574FL)  /*'FAWO'*/
 	{
 		char str[200];
 		fclose(fhndl);
-		sprintf(str, "No Fanwor|level file:|%lx", hd.hmagic);
+		sprintf(str, "No Fanwor|level file:|%lx", (long)hd.hmagic);
 		errfatldlg(str);
+		return -1;
 	}
 
 	r_width=hd.r_wdth;
@@ -136,6 +136,7 @@ int loadroom(void)
 		{
 			fclose(fhndl);
 			errfatldlg("No temporary memory\navailable!");
+			return -1;
 		}
 		oldlen=len;
 	}
@@ -145,6 +146,7 @@ int loadroom(void)
 		free(buf);
 		fclose(fhndl);
 		errfatldlg("Error while reading\nlevel file!");
+		return -1;
 	}
 
 	sfbuf=buf;

@@ -2,12 +2,13 @@
 
 #include <SDL.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "feddefs.h"
 #include "fedmain.h"
 #include "fedgraf.h"
 #include "loadpng.h"
-
+#include "sdlgui.h"
 
 
 /* **Variablen:** */
@@ -18,7 +19,7 @@ const char *groundname="../graphics/ground.png";
 /* *** Beim GUI anmelden *** */
 int initGUI(void)
 {
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		fprintf(stderr, "Could not initialize the SDL library:\n %s\n", SDL_GetError() );
 		return 1;
@@ -37,6 +38,9 @@ int initGUI(void)
 
 	SDL_ShowCursor(1);
 
+	SDLGui_Init();
+	SDLGui_SetScreen(sdlscrn);
+
 	return 0;
 }
 
@@ -44,6 +48,7 @@ int initGUI(void)
 /* ***Beim GUI abmelden*** */
 void exitGUI(void)
 {
+	SDLGui_UnInit();
 	SDL_Quit();
 }
 

@@ -131,7 +131,7 @@ SDL_Surface *LoadPNG(const char *fname)
 	 * the normal method of doing things with libpng).  REQUIRED unless you
 	 * set up your own error handlers in png_create_read_struct() earlier.
 	 */
-	if ( setjmp(png_ptr->jmpbuf) ) {
+	if (setjmp(png_jmpbuf(png_ptr))) {
 		IMG_SetError("Error reading the PNG file.");
 		goto done;
 	}
@@ -184,13 +184,14 @@ SDL_Surface *LoadPNG(const char *fname)
 	/* Allocate the SDL surface to hold the image */
 	Rmask = Gmask = Bmask = Amask = 0 ; 
 	if ( color_type != PNG_COLOR_TYPE_PALETTE ) {
+		int channels = png_get_channels(png_ptr, info_ptr);
 		if ( SDL_BYTEORDER == SDL_LIL_ENDIAN ) {
 			Rmask = 0x000000FF;
 			Gmask = 0x0000FF00;
 			Bmask = 0x00FF0000;
-			Amask = (info_ptr->channels == 4) ? 0xFF000000 : 0;
+			Amask = (channels == 4) ? 0xFF000000 : 0;
 		} else {
-		        int s = (info_ptr->channels == 4) ? 0 : 8;
+		        int s = (channels == 4) ? 0 : 8;
 			Rmask = 0xFF000000 >> s;
 			Gmask = 0x00FF0000 >> s;
 			Bmask = 0x0000FF00 >> s;
@@ -198,25 +199,26 @@ SDL_Surface *LoadPNG(const char *fname)
 		}
 	}
 	surface = SDL_AllocSurface(SDL_SWSURFACE, width, height,
-			bit_depth*info_ptr->channels, Rmask,Gmask,Bmask,Amask);
+				   bit_depth * png_get_channels(png_ptr, info_ptr),
+				   Rmask, Gmask, Bmask, Amask);
 	if ( surface == NULL ) {
 		IMG_SetError("Out of memory");
 		goto done;
 	}
 
 	if(ckey != -1) {
-	        if(color_type != PNG_COLOR_TYPE_PALETTE)
+		if(color_type != PNG_COLOR_TYPE_PALETTE)
 			/* FIXME: Should these be truncated or shifted down? */
-		        ckey = SDL_MapRGB(surface->format,
+			ckey = SDL_MapRGB(surface->format,
 			                 (Uint8)transv->red,
 			                 (Uint8)transv->green,
 			                 (Uint8)transv->blue);
-	        SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
 	}
 
 	/* Create the array of pointers to image data */
 	row_pointers = (png_bytep*) malloc(sizeof(png_bytep)*height);
-	if ( (row_pointers == NULL) ) {
+	if (row_pointers == NULL) {
 		IMG_SetError("Out of memory");
 		SDL_FreeSurface(surface);
 		surface = NULL;
@@ -243,12 +245,15 @@ SDL_Surface *LoadPNG(const char *fname)
 		    palette->colors[i].g = i;
 		    palette->colors[i].b = i;
 		}
-	    } else if (info_ptr->num_palette > 0 ) {
-		palette->ncolors = info_ptr->num_palette; 
-		for( i=0; i<info_ptr->num_palette; ++i ) {
-		    palette->colors[i].b = info_ptr->palette[i].blue;
-		    palette->colors[i].g = info_ptr->palette[i].green;
-		    palette->colors[i].r = info_ptr->palette[i].red;
+	    } else if (png_get_palette_max(png_ptr, info_ptr) > 0 ) {
+		png_colorp png_palette;
+		int png_num_palette;
+		png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_num_palette);
+		palette->ncolors = png_num_palette;
+		for (i = 0; i < png_num_palette; ++i) {
+		    palette->colors[i].b = png_palette[i].blue;
+		    palette->colors[i].g = png_palette[i].green;
+		    palette->colors[i].r = png_palette[i].red;
 		}
 	    }
 	}
